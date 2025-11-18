@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weather App</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+  <!-- Weather Background Effects -->
+  <div class="weather-background">
+    <div class="rain" id="rainEffect"></div>
+    <div class="snow" id="snowEffect"></div>
+    <div class="sunny" id="sunEffect"></div>
+  </div>
+
+  <div class="app-container">
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showPage('home')">Home</button>
+      <button class="nav-tab" onclick="showPage('current')">Current Weather</button>
+      <button class="nav-tab" onclick="showPage('history')">History & Data</button>
+      <button class="nav-tab" onclick="showPage('ai')">AI Analysis</button>
+      <button class="nav-tab" onclick="showPage('feedback')">Feedback</button>
+    </div>
+
+    <div class="container">
+      <!-- Home Page -->
+      <div id="home-page" class="page active">
+        <div class="welcome-container">
+          <p class="welcome-subtitle">Your comprehensive weather tracking and analysis companion</p>
+          
+          <div class="project-info">
+            <div class="info-card">
+              <h2>📋 About This Project</h2>
+              <p>Weather Monitor is a modern, feature-rich weather application that provides real-time weather data, historical analysis, AI-powered insights, and user feedback capabilities. Built with vanilla JavaScript, it integrates multiple APIs and services to deliver a complete weather experience.</p>
+            </div>
+            
+            <div class="features-grid">
+              <div class="feature-card" onclick="showPage('current')">
+                <div class="feature-icon">🌡️</div>
+                <h3>Current Weather</h3>
+                <p>Get real-time weather data for any city worldwide with beautiful animations and detailed information.</p>
+                <span class="feature-link">Explore Weather →</span>
+              </div>
+              
+              <div class="feature-card" onclick="showPage('history')">
+                <div class="feature-icon">📊</div>
+                <h3>History & Data</h3>
+                <p>View historical weather patterns, search history, and interactive charts with 5-day forecasts.</p>
+                <span class="feature-link">View Data →</span>
+              </div>
+              
+              <div class="feature-card" onclick="showPage('ai')">
+                <div class="feature-icon">🤖</div>
+                <h3>AI Analysis</h3>
+                <p>Get intelligent weather insights, recommendations, and detailed analysis powered by AI algorithms.</p>
+                <span class="feature-link">Get Analysis →</span>
+              </div>
+              
+              <div class="feature-card" onclick="showPage('feedback')">
+                <div class="feature-icon">💬</div>
+                <h3>Feedback</h3>
+                <p>Share your thoughts, report bugs, or suggest new features to help us improve the app.</p>
+                <span class="feature-link">Give Feedback →</span>
+              </div>
+            </div>
+            
+            <div class="tech-stack">
+              <h3>🛠️ Built With</h3>
+              <div class="tech-badges">
+                <span class="tech-badge">JavaScript ES6+</span>
+                <span class="tech-badge">OpenWeatherMap API</span>
+                <span class="tech-badge">Chart.js</span>
+                <span class="tech-badge">Leaflet Maps</span>
+                <span class="tech-badge">EmailJS</span>
+                <span class="tech-badge">Lottie Animations</span>
+                <span class="tech-badge">CSS3</span>
+                <span class="tech-badge">HTML5</span>
+              </div>
+            </div>
+            
+            <div class="quick-start">
+              <h3>🚀 Quick Start</h3>
+              <div class="start-steps">
+                <div class="step">
+                  <span class="step-number">1</span>
+                  <p>Click on <strong>"Current Weather"</strong> to search for weather in any city</p>
+                </div>
+                <div class="step">
+                  <span class="step-number">2</span>
+                  <p>Use the <strong>location button</strong> to find weather data using interactive maps</p>
+                </div>
+                <div class="step">
+                  <span class="step-number">3</span>
+                  <p>Explore <strong>"History & Data"</strong> for trends and forecasts</p>
+                </div>
+                <div class="step">
+                  <span class="step-number">4</span>
+                  <p>Try <strong>"AI Analysis"</strong> for intelligent weather insights</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="cta-section">
+              <button class="cta-button" onclick="startExploring()">
+                🌤️ Start Exploring Weather
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Current Weather Page -->
+      <div id="current-page" class="page">
+        <h1>🌤 Weather App</h1>
+        <div class="search-container">
+          <input type="text" id="cityInput" placeholder="Enter city name" />
+          <button onclick="getWeather()">Search</button>
+        </div>
+        <button onclick="openMap()" style="width: 100%; margin-bottom: 15px;">📍 Search by Location</button>
+
+        <div class="weather-animation" id="weatherAnimation"></div>
+        <div class="weather-info" id="weatherInfo"></div>
+      </div>
+
+      <!-- History & Data Page -->
+      <div id="history-page" class="page">
+        <h1>📊 Weather History</h1>
+        <div class="history-container">
+          <div class="history-title">Recent Searches:</div>
+          <div class="history-list" id="historyList"></div>
+          <button class="clear-history" onclick="clearHistory()">Clear History</button>
+        </div>
+        
+        <!-- Historical Data Section -->
+        <div class="historical-section">
+          <div class="historical-title">Historical Weather Data</div>
+          <div class="date-range">
+            <input type="date" id="startDate" />
+            <span>to</span>
+            <input type="date" id="endDate" />
+          </div>
+          <button class="historical-btn" onclick="getHistoricalData()">Get Historical Data</button>
+          <div class="chart-container">
+            <canvas id="historicalChart"></canvas>
+          </div>
+        </div>
+        
+        <div class="historical-section">
+          <div class="historical-title">5-Day Forecast</div>
+          <div class="forecast-container" id="forecastContainer"></div>
+        </div>
+      </div>
+
+      <!-- AI Analysis Page -->
+      <div id="ai-page" class="page">
+        <h1>🤖 AI Weather Analysis</h1>
+        <div class="ai-analysis-container">
+          <div class="historical-title">AI-Powered Weather Insights</div>
+          <p>Get detailed analysis and recommendations based on current weather conditions using Puter.js AI.</p>
+          <div class="auth-info" style="background: #e8f5e8; padding: 10px; border-radius: 5px; margin: 10px 0; font-size: 14px;">
+            <strong>✅ Ready:</strong> AI-powered weather analysis using intelligent algorithms.
+          </div>
+          <button class="generate-analysis-btn" onclick="generateAIAnalysis()">Generate AI Analysis</button>
+          <div class="ai-analysis-box" id="aiAnalysisResult">
+            <div class="ai-loading" id="aiLoading" style="display: none;">
+              <div class="ai-loading-dots">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+              </div>
+            </div>
+            <div class="ai-analysis-content" id="aiAnalysisContent"></div>
+            <div class="ai-error" id="aiError"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feedback Page -->
+      <div id="feedback-page" class="page">
+        <h1>💬 Feedback & Support</h1>
+        <div class="feedback-container">
+          <div class="historical-title">We'd Love to Hear From You!</div>
+          <p>Your feedback helps us improve the weather app. Please share your thoughts, suggestions, or report any issues.</p>
+          
+          <form id="feedbackForm" class="feedback-form">
+            <div class="form-group">
+              <label for="userName">Name:</label>
+              <input type="text" id="userName" name="user_name" required placeholder="Enter your name">
+            </div>
+            
+            <div class="form-group">
+              <label for="userEmail">Email:</label>
+              <input type="email" id="userEmail" name="user_email" required placeholder="Enter your email">
+            </div>
+            
+            <div class="form-group">
+              <label for="feedbackType">Feedback Type:</label>
+              <select id="feedbackType" name="feedback_type" required>
+                <option value="">Select feedback type</option>
+                <option value="Bug Report">Bug Report</option>
+                <option value="Feature Request">Feature Request</option>
+                <option value="General Feedback">General Feedback</option>
+                <option value="UI/UX Suggestion">UI/UX Suggestion</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="rating">Rate Your Experience:</label>
+              <div class="rating-container">
+                <div class="stars" id="starRating">
+                  <span class="star" data-rating="1">⭐</span>
+                  <span class="star" data-rating="2">⭐</span>
+                  <span class="star" data-rating="3">⭐</span>
+                  <span class="star" data-rating="4">⭐</span>
+                  <span class="star" data-rating="5">⭐</span>
+                </div>
+                <input type="hidden" id="userRating" name="user_rating" value="0">
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="feedbackMessage">Message:</label>
+              <textarea id="feedbackMessage" name="message" rows="6" required placeholder="Please describe your feedback in detail..."></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="includeWeatherData" name="include_weather_data">
+                Include current weather data with feedback (helps with bug reports)
+              </label>
+            </div>
+            
+            <button type="submit" class="submit-feedback-btn">
+              <span class="btn-text">Send Feedback</span>
+              <span class="btn-loading" style="display: none;">Sending...</span>
+            </button>
+          </form>
+          
+          <div class="feedback-status" id="feedbackStatus"></div>
+          
+          <div class="feedback-info">
+            <h3>Other Ways to Reach Us:</h3>
+            <p>📧 Email: yahoshuva138@gmail.com</p>
+            <p>🐛 Found a critical bug? Report it immediately!</p>
+            <p>💡 Have an idea? We'd love to hear it!</p>
+            <p>📞 Need immediate assistance? <a href="tel:+9182439951">9182439951</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="mapContainer">
+    <div id="map"></div>
+    <div class="map-controls">
+      <button class="map-btn location-btn" onclick="useCurrentLocation()">Use Current Location</button>
+      <button class="map-btn" onclick="useSelectedLocation()">Use Selected Location</button>
+      <button class="map-btn close-btn" onclick="closeMap()">Close</button>
+    </div>
+  </div>
+
+  <script src="https://js.puter.com/v2/"></script>
+  <script src="script.js"></script>
+
+</body>
+</html>
